@@ -6,19 +6,43 @@ from .storage import *
 router = APIRouter()
 
 
+@router.get("")
+async def read_all_students():
+    return STUDENTS
+
+
+@router.get("/{student_id}")
+async def read_student(student_id: int):
+    return {f"{student_id}": STUDENTS[student_id]}
+
+
 @router.post("")
-async def create_item(student: StudentCreateSchema):
-    s = Student(
-        first_name=student.first_name,
-        last_name=student.last_name,
-        student_id=len(STUDENTS) + 1,
+async def create_student(student: StudentCreateSchema):
+    id = len(STUDENTS) + 1
+    new_student = Student(
+        **student.dict(),
+        student_id=id,
     )
-    STUDENTS[s.student_id] = s
-    return s
+    if new_student.first_name == "" or new_student.last_name == "":
+        raise HTTPException(status_code=400, detail="Empty student data")
+    else:
+        STUDENTS[id] = new_student
+
+    return new_student
 
 
-@router.put("{student_id}")
-async def update_item(student_id: int, student: StudentUpdateSchema):
+@router.delete("/{student_id}")
+async def delete_student(student_id: int):
+    if student_id not in STUDENTS.keys():
+        raise HTTPException(status_code=404, detail="Student not found")
+    else:
+        del STUDENTS[student_id]
+
+    return {"Student deleted": True}
+
+
+@router.put("/{student_id}")
+async def update_student(student_id: int, student: StudentUpdateSchema):
     if student_id not in STUDENTS.keys():
         raise HTTPException(status_code=404, detail="Student not found")
     else:
@@ -30,8 +54,3 @@ async def update_item(student_id: int, student: StudentUpdateSchema):
         STUDENTS[updated_student.student_id] = updated_student
 
     return updated_student
-
-
-@router.get("")
-async def read_item():
-    return STUDENTS

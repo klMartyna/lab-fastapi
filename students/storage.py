@@ -2,7 +2,7 @@ from functools import lru_cache
 
 from .schema import Student
 
-STUDENTS: dict[int, Student] = {1 : {"student_id": 1, "first_name": "Ala", "last_name": "Orta"}, 2: {"student_id": 2, "first_name": "Marcin", "last_name": "Liga"}}
+STUDENTS: dict[int, Student] = {}
 
 
 @lru_cache(maxsize=1)
