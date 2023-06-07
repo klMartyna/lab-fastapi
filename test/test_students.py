@@ -1,5 +1,5 @@
-from fastapi.testclient import TestClient
 import pytest
+from fastapi.testclient import TestClient
 
 from main import app
 
@@ -20,80 +20,49 @@ def test_create_student():
     assert response.status_code == 200
     assert response.json() == {
         "student_id": 1,
-        "first_name": "Karol", 
-        "last_name": "Krotkowski"
+        "first_name": "Karol",
+        "last_name": "Krotkowski",
     }
 
 
 def test_create_student_missing_data():
     response = client.post(
-        "/students",
-        json={"first_name": "", "last_name": "Krotkowski"}
+        "/students", json={"first_name": "", "last_name": "Krotkowski"}
     )
     assert response.status_code == 400
-    assert response.json() == {
-        "detail": "Empty student data"
-    }
+    assert response.json() == {"detail": "Empty student data"}
 
 
 def test_create_and_get_3_students():
-    client.post(
-        "/students",
-        json={"first_name": "Karol", "last_name": "Krotkowski"}
-    )
-    client.post(
-        "/students",
-        json={"first_name": "Ala", "last_name": "Orta"}
-    )
-    client.post(
-        "/students",
-        json={"first_name": "Marcin", "last_name": "Liga"}
-    )
+    client.post("/students", json={"first_name": "Karol", "last_name": "Krotkowski"})
+    client.post("/students", json={"first_name": "Ala", "last_name": "Orta"})
+    client.post("/students", json={"first_name": "Marcin", "last_name": "Liga"})
 
     response = client.get("/students")
     assert response.status_code == 200
     assert response.json() == {
-        "1": {
-            "student_id": 1,
-            "first_name": "Karol",
-            "last_name": "Krotkowski"
-            },
-        "2": {
-            "student_id": 2,
-            "first_name": "Ala",
-            "last_name": "Orta"
-            },
-        "3": {
-            "student_id": 3,
-            "first_name": "Marcin",
-            "last_name": "Liga"
-            }
+        "1": {"student_id": 1, "first_name": "Karol", "last_name": "Krotkowski"},
+        "2": {"student_id": 2, "first_name": "Ala", "last_name": "Orta"},
+        "3": {"student_id": 3, "first_name": "Marcin", "last_name": "Liga"},
     }
 
 
 def test_update_student_data():
-    client.post(
-        "/students",
-        json={"first_name": "Karol", "last_name": "Krotkowski"}
-    )
+    client.post("/students", json={"first_name": "Karol", "last_name": "Krotkowski"})
 
     response = client.put(
-        "/students/1",
-        json={"first_name": "Lidia", "last_name": "Sobialska"}
+        "/students/1", json={"first_name": "Lidia", "last_name": "Sobialska"}
     )
     assert response.status_code == 200
     assert response.json() == {
         "student_id": 1,
         "first_name": "Lidia",
-        "last_name": "Sobialska"
+        "last_name": "Sobialska",
     }
 
 
 def test_delete_student():
-    client.post(
-        "/students",
-        json={"first_name": "Karol", "last_name": "Krotkowski"}
-    )
+    client.post("/students", json={"first_name": "Karol", "last_name": "Krotkowski"})
 
     response = client.delete("/students/1")
     assert response.status_code == 200
