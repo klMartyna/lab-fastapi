@@ -69,7 +69,7 @@ def test_delete_student():
     assert response.json() == {"Student deleted": True}
 
 
-def test_delete_nonexistant_student():
+def test_delete_nonexistent_student():
     response = client.delete("/students/10")
     assert response.status_code == 404
     assert response.json() == {"detail": "Student not found"}
