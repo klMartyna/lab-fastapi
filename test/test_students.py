@@ -74,6 +74,17 @@ def test_delete_nonexistent_student():
     assert response.status_code == 404
     assert response.json() == {"detail": "Student not found"}
 
+def test_create_mark():
+    client.post(
+        "/students",
+        json={"first_name": "Karol", "last_name": "Krotkowski"},
+    )
+
+    response = client.post(
+        "/students/1/marks/4"
+    )
+    assert response.status_code == 200
+    assert response.json() == 4
 
 @pytest.fixture(autouse=True)
 def delete_all_students():

@@ -13,20 +13,23 @@ async def read_all_students():
 
 @router.get("/{student_id}")
 async def read_student(student_id: int):
+    if student_id not in STUDENTS.keys():
+        raise HTTPException(status_code=404, detail="Student not found")
+    
     return {f"{student_id}": STUDENTS[student_id]}
 
 
 @router.post("")
 async def create_student(student: StudentCreateSchema):
+    if student.first_name == "" or student.last_name == "":
+        raise HTTPException(status_code=400, detail="Empty student data")
+    
     id = len(STUDENTS) + 1
     new_student = Student(
-        **student.dict(),
-        student_id=id,
+    **student.dict(),
+    student_id=id,
     )
-    if new_student.first_name == "" or new_student.last_name == "":
-        raise HTTPException(status_code=400, detail="Empty student data")
-    else:
-        STUDENTS[id] = new_student
+    STUDENTS[id] = new_student
 
     return new_student
 
@@ -35,8 +38,8 @@ async def create_student(student: StudentCreateSchema):
 async def delete_student(student_id: int):
     if student_id not in STUDENTS.keys():
         raise HTTPException(status_code=404, detail="Student not found")
-    else:
-        del STUDENTS[student_id]
+    
+    del STUDENTS[student_id]
 
     return {"Student deleted": True}
 
@@ -45,12 +48,29 @@ async def delete_student(student_id: int):
 async def update_student(student_id: int, student: StudentUpdateSchema):
     if student_id not in STUDENTS.keys():
         raise HTTPException(status_code=404, detail="Student not found")
-    else:
-        updated_student = Student(
-            first_name=student.first_name,
-            last_name=student.last_name,
-            student_id=student_id,
-        )
-        STUDENTS[updated_student.student_id] = updated_student
+    
+    updated_student = Student(
+        first_name=student.first_name,
+        last_name=student.last_name,
+        student_id=student_id,
+    )
+    STUDENTS[updated_student.student_id] = updated_student
 
     return updated_student
+
+@router.post("/{student_id}/marks/{mark:float}")
+async def create_mark(student_id: int, mark: Mark):
+    if student_id not in STUDENTS.keys():
+        raise HTTPException(status_code=404, detail="Student not found")
+
+    new_mark = Mark(mark)
+    MARKS[student_id].append(new_mark)
+
+    return new_mark
+
+@router.get("/{student_id}/marks")
+async def read_marks(student_id: int):
+    if student_id not in STUDENTS.keys():
+        raise HTTPException(status_code=404, detail="Student not found")
+    
+    return MARKS[student_id]
