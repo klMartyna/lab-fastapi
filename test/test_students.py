@@ -29,7 +29,7 @@ def test_create_student_missing_data():
     response = client.post(
         "/students", json={"first_name": "", "last_name": "Krotkowski"}
     )
-    assert response.status_code == 400
+    assert response.status_code == 422
     assert response.json() == {"detail": "Empty student data"}
 
 

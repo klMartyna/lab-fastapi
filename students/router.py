@@ -22,7 +22,7 @@ async def read_student(student_id: int):
 @router.post("")
 async def create_student(student: StudentCreateSchema):
     if student.first_name == "" or student.last_name == "":
-        raise HTTPException(status_code=400, detail="Empty student data")
+        raise HTTPException(status_code=422, detail="Empty student data")
     
     id = len(STUDENTS) + 1
     new_student = Student(
