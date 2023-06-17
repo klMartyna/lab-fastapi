@@ -74,6 +74,7 @@ def test_delete_nonexistent_student():
     assert response.status_code == 404
     assert response.json() == {"detail": "Student not found"}
 
+
 def test_create_mark():
     client.post(
         "/students",
@@ -85,6 +86,32 @@ def test_create_mark():
     )
     assert response.status_code == 200
     assert response.json() == 4
+
+
+def test_create_mark_with_incorrect_format():
+    client.post(
+        "/students",
+        json={"first_name": "Karol", "last_name": "Krotkowski"},
+    )
+
+    response = client.post(
+        "/students/1/marks/1"
+    )
+    assert response.status_code == 422
+    assert response.json() == {
+        "detail": 
+        [{'ctx': {'enum_values': [5.0, 4.5, 4.0, 3.5, 3.0, 2.0]}, 
+          'loc': ['path', 'mark'], 
+          'msg': 'value is not a valid enumeration member; permitted: 5.0, 4.5, 4.0, 3.5, 3.0, 2.0', 
+          'type': 'type_error.enum'}]
+    }
+
+
+def test_create_mark_for_nonexistent_student():
+    response = client.post("/students/5/marks/4")
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Student not found"}
+
 
 @pytest.fixture(autouse=True)
 def delete_all_students():

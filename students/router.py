@@ -24,12 +24,17 @@ async def create_student(student: StudentCreateSchema):
     if student.first_name == "" or student.last_name == "":
         raise HTTPException(status_code=422, detail="Empty student data")
     
-    id = len(STUDENTS) + 1
+    if len(STUDENTS) == 0:
+        id = 1
+    else:
+        id = list(STUDENTS)[-1] + 1
+
     new_student = Student(
     **student.dict(),
     student_id=id,
     )
     STUDENTS[id] = new_student
+    MARKS[id] = []
 
     return new_student
 
@@ -40,6 +45,7 @@ async def delete_student(student_id: int):
         raise HTTPException(status_code=404, detail="Student not found")
     
     del STUDENTS[student_id]
+    del MARKS[student_id]
 
     return {"Student deleted": True}
 
@@ -48,6 +54,8 @@ async def delete_student(student_id: int):
 async def update_student(student_id: int, student: StudentUpdateSchema):
     if student_id not in STUDENTS.keys():
         raise HTTPException(status_code=404, detail="Student not found")
+    if student.first_name == "" or student.last_name == "":
+        raise HTTPException(status_code=422, detail="Empty student data")
     
     updated_student = Student(
         first_name=student.first_name,
